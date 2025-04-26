@@ -1,0 +1,6 @@
+O que compilar?
+gcc -c aviao.c
+gcc -c parte1.c
+gcc -c voar.c
+gcc -o main aviao.o parte1.o 
+gcc -o voar aviao.o voar.o
