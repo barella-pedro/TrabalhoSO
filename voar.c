@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
     int pid_aviao;
     int pista_destino;
     pid_aviao = getpid(); //armazena o pid do voo;
-    atraso = ((float)rand() / RAND_MAX) * 2.0f;
+    atraso = ((float)rand() / RAND_MAX) * 2.0f; //numero aleatorio de 0 a 2
     y = ((float)rand() / RAND_MAX);
     direcao = (rand() % 2 == 0) ? 'W' : 'E'; // Escolher aleatoriamente entre W e E, utilizando resto de 2.
     printf("%c\n\n",direcao);
@@ -65,19 +65,27 @@ int main(int argc, char* argv[]){
         printf("Voando!\n");
         //movimento horizontal(em x)
         if ((mem_aviao->direcao == 'W') && ((mem_aviao->x) < 0.5)) {
-            mem_aviao->x += 0.05; // vem da esquerda para o centro
+            mem_aviao->x += 0.05f; // vem da esquerda para o centro
         } 
         else if ((mem_aviao->direcao == 'E') && ((mem_aviao->x) > 0.5)) {
             
-            mem_aviao->x -= 0.05; // vem da direita para o centro
+            mem_aviao->x -= 0.05f; // vem da direita para o centro
         }
         //movimento vertical(em y)
-        if (mem_aviao->y < 0.5) mem_aviao->y += 0.01; // se o aviao iniciar abaixo do aeroporto
-        else if (mem_aviao->y > 0.5) mem_aviao->y -= 0.01; //se iniciar acima do aeroporto
+        if (mem_aviao->y < 0.5f){
+            puts("Y abaixo do aviao!\n");
+            mem_aviao->y += 0.01f; // se o aviao iniciar abaixo do aeroporto  
+            printf("Pos Y:%f\n",mem_aviao->y);
+        }  
+        else if (mem_aviao->y > 0.5f){
+            puts("Y abaixo do aviao!\n");
+            mem_aviao->y -= 0.01f; //se iniciar acima do aeroporto  
+            printf("Pos Y:%f\n",mem_aviao->y);
+        } 
 
         //pousando
-        if (fabs(mem_aviao->x - 0.5f) < 0.005) mem_aviao->x = 0.5f; //Definindo um valor minimo de proximidade
-        if (fabs(mem_aviao->y - 0.5f) < 0.005) mem_aviao->y = 0.5f; //Fazendo-se o mesmo para y
+        if (fabs(mem_aviao->x - 0.5f) < 0.01) mem_aviao->x = 0.5f; //Definindo um valor minimo de proximidade
+        if (fabs(mem_aviao->y - 0.5f) < 0.01) mem_aviao->y = 0.5f; //Fazendo-se o mesmo para y
         if (mem_aviao->x == 0.5f && mem_aviao->y == 0.5f){
             mem_aviao->status = STATUS_ATERRISSADO;
             printf("Avião PID %d pousou com sucesso!\n", mem_aviao->pid);

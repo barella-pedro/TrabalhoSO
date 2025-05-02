@@ -46,12 +46,12 @@ int main(){
     int voo_atual = 0;
     int voos_ativos = N;
     sleep(3);
-    while (voos_ativos > 0) {
+    while (voos_ativos > 0) { //Round Robin
         if (frota[voo_atual].status == STATUS_VOANDO) {
             printf("While 1 do pai\n");
             // Acorda
             kill(frota[voo_atual].pid, SIGCONT);
-            sleep(5); // tempo de "voo"
+            sleep(2); // tempo de "voo", dando 2 segundos pro filho voar
             kill(frota[voo_atual].pid, SIGSTOP);
             
             printf("Local do aviao %d: %f %f\n",voo_atual,frota[voo_atual].x, frota[voo_atual].y);
@@ -78,6 +78,7 @@ int main(){
     shmdt(frota);
     shmctl(segmento, IPC_RMID, 0);
     return 0;
+    
 }
 
 void testa_mem(int segmento){
