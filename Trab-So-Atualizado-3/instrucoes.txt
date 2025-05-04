@@ -1,0 +1,18 @@
+O que compilar?
+gcc -c aviao.c
+gcc -c main2.c
+gcc -c voar2.c
+gcc -o main2 aviao.o main2.o 
+gcc -o voar2 aviao.o voar2.o
+gcc -o interface interface.c `pkg-config --cflags --libs gtk+-3.0`
+
+
+./interface "ID do memória compartilhada que vai aparecer quando você executar a main2 no outro terminal."
+
+
+gcc -c aviao.c
+gcc -c main3.c
+gcc -c voar2.c
+gcc -o main3 aviao.o main3.o 
+gcc -o voar2 aviao.o voar2.o
+gcc -o interface interface.c `pkg-config --cflags --libs gtk+-3.0`
