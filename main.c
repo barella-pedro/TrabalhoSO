@@ -25,6 +25,8 @@ int main(){
     teste_attach(frota);
     /*****************************************/
     
+    
+    
     for (i = 0; i < N; i++){
         if ((pid_f = fork()) < 0 ){
             perror("Erro ao criar processo filho\n");

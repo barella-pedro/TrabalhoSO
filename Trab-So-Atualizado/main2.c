@@ -74,9 +74,9 @@ int main(){
             // Se ambos estão perto do centro do aeroporto
             float dx_pista = frota[voo_atual].x - 0.5f;
             float dy_pista = frota[voo_atual].y - 0.5f;
-            float dist_pista = dx_pista * dx_pista + dy_pista * dy_pista;
+            float dist_pista_2 = dx_pista * dx_pista + dy_pista * dy_pista;
 
-            if (dist2 < 0.0025f && dist_pista < 0.0025f) // < 0.05^2 de outro avião e da pista
+            if (dist2 < 0.0025f && dist_pista_2 < 0.0025f) // < 0.05^2 de outro avião e da pista
             { 
                 if (frota[voo_atual].pista_destino == frota[j].pista_destino) 
                 {

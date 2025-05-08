@@ -19,7 +19,7 @@ void trata_toggle_freio(int sinal){
     if (mem_aviao->status == STATUS_VOANDO){
         printf("[AVIÃO %d] Reduzindo velocidade. Status: PAUSADO\n", getpid());
         mem_aviao->status = STATUS_PAUSADO;
-        pause();
+        pause(); 
         return;
     }
     else if (mem_aviao->status == STATUS_PAUSADO){
@@ -35,16 +35,16 @@ void trata_toggle_pista(int sinal){
     int pista_antiga = mem_aviao->pista_destino;
     
     if (mem_aviao->direcao == 'W'){
-        if (mem_aviao->pista_destino == 2) mem_aviao->pista_destino = 3;
-        else mem_aviao->pista_destino = 2;
+        if (mem_aviao->pista_destino == 18) mem_aviao->pista_destino = 03;
+        else mem_aviao->pista_destino = 18;
         printf("[AVIÃO %d] Mudando da pista %d para a pista %d\n", 
             getpid(), pista_antiga, mem_aviao->pista_destino);
             pause();
             return;
         }
         else { // Direcao E
-            if (mem_aviao->pista_destino == 0) mem_aviao->pista_destino = 1;
-            else mem_aviao->pista_destino = 0;
+            if (mem_aviao->pista_destino == 06) mem_aviao->pista_destino = 27;
+            else mem_aviao->pista_destino = 06;
             printf("[AVIÃO %d] Mudando da pista %d para a pista %d\n", 
                 getpid(), pista_antiga, mem_aviao->pista_destino);
             pause();
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]){
     teste_attach(frota);
     mem_aviao = &frota[indice];
     
-    
+    // Handlers de Signals
     signal(SIGCONT, trata_sigcont);
     signal(SIGUSR2, trata_toggle_pista);
     signal(SIGUSR1, trata_toggle_freio);
@@ -81,12 +81,13 @@ int main(int argc, char* argv[]){
     if (direcao == 'E') {
         x = 1.0f;
         pista_destino = rand() % 2;//Pistas 0 e 1 para E
+        pista_destino = (pista_destino == 0) ? 06 : 27;
 
     }
     else if (direcao == 'W') {
         x = 0.0f;
         pista_destino = 2 + (rand() % 2);// Pistas 2 e 3 para W
-
+        pista_destino = (pista_destino == 2) ? 03 : 18;
         
     }
     printf("Indice no voar: %d\n",indice);
@@ -98,14 +99,18 @@ int main(int argc, char* argv[]){
     frota[indice].pista_destino = pista_destino;
     frota[indice].atraso = atraso;
     frota[indice].direcao = direcao;
-    frota[indice].status = STATUS_VOANDO;
+    frota[indice].status = STATUS_FORA_ESPACO_AEREO ;
     frota[indice].velocidade = 0.0f; // inicialmente o aviao está parado em y
     printf("[AVIÃO %d] Criado: Índice %d - atraso: %.2f, x = %.2f, y = %.2f, direção = %c, pista = %d\n", 
     pid_aviao, indice, frota[indice].atraso, frota[indice].x, frota[indice].y, frota[indice].direcao, frota[indice].pista_destino);
     sleep(2);
     pause();//Aviao criado, agora esperamos o Processo Pai "continuar" o filho por Round Robin   
     printf("depois do pause\n");
+    /*Implementar Tempo de Espera aqui!!*/
+    printf("Aviao deve esperar inicialmente: %.2f segundos!\n",atraso);
     
+    sleep(atraso);
+    frota[indice].status = STATUS_VOANDO ;
     while(1){
         printf("[AVIÃO %d] Posição atual: (%.2f, %.2f) | Pista: %d | Status: %d\n",
                mem_aviao->pid, mem_aviao->x, mem_aviao->y, mem_aviao->pista_destino,

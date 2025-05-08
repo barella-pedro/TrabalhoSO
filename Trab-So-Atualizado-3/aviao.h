@@ -4,9 +4,10 @@
 #include <unistd.h> // Para pid_t
 
 #define STATUS_VOANDO 1
-#define STATUS_PAUSADO  2
-#define STATUS_ATERRISSADO  3
+#define STATUS_PAUSADO 2
+#define STATUS_ATERRISSADO 3
 #define STATUS_REMOVIDO 4
+#define STATUS_FORA_ESPACO_AEREO 5
 
 typedef struct aviao {
     pid_t pid;

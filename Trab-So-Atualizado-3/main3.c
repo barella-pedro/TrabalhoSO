@@ -10,13 +10,19 @@
 #include "aviao.h"
 //LEMBRAR COLOCAR CADA FUNÇÃO UTILIZADA POR CADA INCLUDE - PODE AJUDAR A ESCREVER O RELATÓRIO E REMOVER INCLUDES DESNECESSÁRIOS
 //TIRAR DPS
-#define N 5
 
 void testa_mem(int segmento);
 void teste_attach(Aviao* frota);
 float calcula_dist2(float x1, float y1, float x2, float y2);
 
-int main(){
+int main(int argc, char* argv[]){
+
+    if (argc != 2) {
+        fprintf(stderr, "Uso correto: main3 <n_avioes>\n");
+        exit(1);
+    }
+    int N = atoi(argv[1]);
+    
     int pid_f,pid_interface, i;
     int segmento;
     /*INICIALIZAÇÃO DA MEMÓRIA COMPARTILHADA */
@@ -26,6 +32,8 @@ int main(){
     frota = (Aviao*)shmat(segmento, NULL, 0);
     teste_attach(frota);
     /*****************************************/
+    
+    /*Inicializa Interface!                  */ 
     pid_f = fork();
     if (pid_f < 0) {
         perror("Erro ao criar filho!");
@@ -39,7 +47,9 @@ int main(){
         perror("Erro ao executar interface"); // Se chegar aqui, houve erro no execl
         exit(1);
     }  
+    /*************************************** */
 
+    /*Criação dos Processos Filho (Aviões)*/
 
     int pids[N];       //Vetor para armazenar os pids    
     for (i = 0; i < N; i++){
@@ -48,13 +58,12 @@ int main(){
             exit(1);
         }
         else if (pid_f == 0){
-            pids[i] = getpid();
             char indice[10], id_shm[10];
             sprintf(indice, "%d", i);//transformando i em string para entrar no argv de voar
             sprintf(id_shm, "%d", segmento);//transformando o i
             printf("%s\n",indice);printf("%s\n",id_shm);
             sleep(2);
-            execl("./voar2", "voar2", indice, id_shm, NULL);
+            execl("./voar2", "voar2", indice, id_shm, NULL);//Implementar teste para execl (que nem na prova P1)
             exit(1);
         }
             else {
@@ -62,7 +71,7 @@ int main(){
         }
     }
 
-        
+    /***************************************** */
     printf("ID da Frota (shm) = %d\n\n", segmento);
     
 
@@ -77,7 +86,10 @@ int main(){
         printf("Meu status: %d\n", frota[voo_atual].status);
         printf("Avioes ativos = %d\n", voos_ativos);
 
-        
+        if (frota[voo_atual].status == STATUS_FORA_ESPACO_AEREO){
+            goto round_robin;
+
+        }
         if (frota[voo_atual].status == STATUS_VOANDO) {
 
             for (int j = 0; j < N; j++){
@@ -270,4 +282,11 @@ float calcula_dist2(float x1, float y1, float x2, float y2){
     float dy = y1 - y2;
     float dist2 = dx * dx + dy * dy;
     return dist2;
+}
+
+void round_robin(int pid, float tempo){
+    kill(pid, SIGCONT); // Se o filho ta voando, voa normal, se foi Pausado, recebe um SIGCONT para entao receber os Sinais pendentes da Torre.
+    sleep(tempo); // tempo de "voo", dando 2 segundos pro filho voar
+    kill(pid, SIGSTOP);
+
 }

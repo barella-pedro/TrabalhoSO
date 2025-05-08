@@ -29,7 +29,7 @@ gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
     cairo_fill(cr);
 
     for (int i = 0; i < N; i++) {
-        if ((frota[i].status == STATUS_VOANDO) || (frota[i].status == STATUS_PAUSADO) ) {
+        if ((frota[i].status == STATUS_VOANDO) || (frota[i].status == STATUS_PAUSADO) || (frota[i].status == STATUS_FORA_ESPACO_AEREO)  ) {
             float x = frota[i].x;
             float y = frota[i].y;
 

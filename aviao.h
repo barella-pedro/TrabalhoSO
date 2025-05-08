@@ -8,6 +8,19 @@
 #define STATUS_ATERRISSADO  3
 #define STATUS_REMOVIDO 4
 
+/*
+
+
+1110 1111
+
+0000 0000
+0001 0000
+
+( ((i & 0xffffffef)) == 0 && (i != 0x00) && (i != 0x10) )
+
+
+*/
+
 typedef struct aviao {
     pid_t pid;
     int pista_destino;
