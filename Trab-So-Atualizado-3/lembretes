@@ -3,15 +3,22 @@ poder parar o programa e verificar as informações atuais de cada avião.
 
 O que falta?
 
--- Implementar o atraso
 -- Avaliar distancias de aproximação e velocidade em Y (atualmente ambos estao igual a 0.0)
 -- Tratamento de colisões
 -- Mudar nº das pistas conforme o enunciado
 -- Interface gráfica
 -- Controle da trajetório para ficar bonita...
 
--> implementar espera
 -> revisar
 -> implementar comandos de pausar e mostrar tudo
 -> colocar em daemon
 ...
+
+08/05 - Lembretes:
+
+-> Problemas do nosso codigo: 
+    - Caso em um aviao vem logo atras de outro e fica a uma posicao menor do que 0.1 do outro.
+
+    - O aviao pausado (que reduziu velocidade) não gera colisoes (não é um problema mas só uma observação).
+
+    - 

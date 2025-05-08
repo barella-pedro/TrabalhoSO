@@ -10,7 +10,7 @@
 #include "aviao.h"
 //LEMBRAR COLOCAR CADA FUNÇÃO UTILIZADA POR CADA INCLUDE - PODE AJUDAR A ESCREVER O RELATÓRIO E REMOVER INCLUDES DESNECESSÁRIOS
 //TIRAR DPS
-
+void round_robin(int pid, float tempo);
 void testa_mem(int segmento);
 void teste_attach(Aviao* frota);
 float calcula_dist2(float x1, float y1, float x2, float y2);
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]){
             for (int j = 0; j < N; j++){
                 //CASOS SEM RISCO!!
                 if (j == voo_atual) continue;
-                if (frota[j].status != STATUS_VOANDO) continue;
+            if (frota[j].status != STATUS_VOANDO && (frota[j].status != STATUS_PAUSADO)) continue;
                 else if (frota[j].direcao != frota[voo_atual].direcao) continue; //Direcoes diferentes
                 else if (frota[j].pista_destino != frota[voo_atual].pista_destino) continue; //Direcoes iguais, mas pistas diferentes
                 //***************/
@@ -105,7 +105,7 @@ int main(int argc, char* argv[]){
                     float dist2 = calcula_dist2(frota[voo_atual].x, frota[voo_atual].y, frota[j].x, frota[j].y);
                     printf("Caso de possivel risco! Distacia ao quadrado entre os avioes %d e %d: %f\n", voo_atual, j, dist2);
                     
-                    if (dist2 < 0.01f){ //Caso a distancia entre eles seja menor que 0.1 (ja era!)
+                    if (dist2 < 0.0001f){ //Caso a distancia entre eles seja menor que 0.01 (ja era!)
                         printf("Distancia critica! Matando o voo %d!\n", voo_atual);
                         kill(pids[voo_atual], SIGKILL);
                         frota[voo_atual].status = STATUS_REMOVIDO;
@@ -113,22 +113,23 @@ int main(int argc, char* argv[]){
                         goto proximo_voo;
                     }
                     
-                    else if ((0.01f < dist2) && (dist2 < 0.04f)){ //Caso o aviao esteja a uma distancia entre 0.2 e 0.1 de outro aviao, tomar uma atitude!
+                    else if ((0.001f < dist2) && (dist2 < 0.01f)){ //Caso o aviao esteja a uma distancia entre 0.2 e 0.1 de outro aviao, tomar uma atitude!
                         //Podemos mudar fulano de pista! Mas posteriormente é preciso verificar se não tem ninguem indo para essa pista por perto tambem.
                         puts("Distancia perigosa! Analisando Situacao...\n");
                         //Vamos ver se podemos mudar o atual de pista:
                         for (int k = 0; k < N; k++){
-                            
+                            //Para todas as pistas que estão na mesma direção mas não estão na mesma pista
                             if ((frota[k].pista_destino != frota[voo_atual].pista_destino) && (frota[k].direcao == frota[voo_atual].direcao)){ 
                                 
-                                float dist_alt2 = calcula_dist2(frota[voo_atual].x, frota[voo_atual].y, frota[k].x, frota[k].y);
+                                float dist_alt2 = calcula_dist2(frota[voo_atual].x, frota[voo_atual].y, frota[k].x, frota[k].y); //Distancia euclidiana ao quadrado
                                 
-                                if (dist_alt2 < 0.04f){ //Se o aviao estiver muito perto, nao podemos mudar de pista de jeito nenhum! - Primeiro caso em que ele para! (toogle de status)
+                                if (dist_alt2 < 0.001f){ //Se o aviao estiver muito perto, nao podemos mudar de pista de jeito nenhum! - Primeiro caso em que ele para! (toogle de status)
                                     printf("Aviao %d esta muito perto do aviao da outra pista para mudar de pista, entao tera que reduzir a velocidade(pausa)\n", voo_atual);
                                     printf("Meu status: %d\n", frota[voo_atual].status);
                                     printf("Enviando sinal de freio!\n");
-                                    if (kill(pids[voo_atual], SIGUSR1) == -1) {
+                                    if (kill(pids[voo_atual], SIGUSR1) == -1) {//Reduz a velocidade! (para)
                                         perror("Erro ao enviar SIGUSR1");
+                                        exit(-1); // TALVEZ SUBSTITUIR POR KILL DEPOIS
                                     }
                                     else printf("Sinal de freio enviado corretamente!\n");
                                     goto round_robin;
@@ -143,7 +144,7 @@ int main(int argc, char* argv[]){
                         //Se nenhum aviao da outra pista tambem esta perto, podemos mudar de pista!
                         kill(pids[voo_atual], SIGUSR2); //Muda o aviao de pista! (toogle de pista)
                         printf("Enviando sinal de troca de pista!\n");
-                        usleep(5000000);
+                        usleep(500000);
                         goto round_robin;
 
                     }
@@ -152,12 +153,10 @@ int main(int argc, char* argv[]){
 
 
             }
-            round_robin:                    
-            // Acorda
-            kill(pids[voo_atual], SIGCONT); // Se o filho ta voando, voa normal, se foi Pausado, recebe um SIGCONT para entao receber os Sinais pendentes da Torre.
-            sleep(2); // tempo de "voo", dando 2 segundos pro filho voar
-            kill(pids[voo_atual], SIGSTOP);
+            round_robin:                 
             
+            round_robin(frota[voo_atual].pid,3);
+
             printf("Local do aviao %d: %f %f\n",voo_atual,frota[voo_atual].x, frota[voo_atual].y);
             // Verifica se pousou
             if (frota[voo_atual].x == 0.5f && frota[voo_atual].y == 0.5f) {
@@ -188,7 +187,7 @@ int main(int argc, char* argv[]){
                 float dist2 = calcula_dist2(frota[voo_atual].x, frota[voo_atual].y, frota[j].x, frota[j].y);
                 
                 // Se ainda estiver muito perto de algum avião
-                if (dist2 < 0.04f) {
+                if (dist2 < 0.01f) {
                     // Calcular distância de cada avião para a pista
                     float dist_pista_atual2 = calcula_dist2(frota[voo_atual].x, frota[voo_atual].y, 0.5f, 0.5f);
                     float dist_pista_j2 = calcula_dist2(frota[j].x, frota[j].y, 0.5f, 0.5f);
@@ -290,3 +289,4 @@ void round_robin(int pid, float tempo){
     kill(pid, SIGSTOP);
 
 }
+

@@ -6,7 +6,7 @@
 #include <cairo.h>
 #include "aviao.h"
 
-#define N 20 // número máximo de aviões
+#define N 100 // número máximo de aviões
 
 Aviao* frota;
 int shm_id;

@@ -39,7 +39,6 @@ void trata_toggle_pista(int sinal){
         else mem_aviao->pista_destino = 18;
         printf("[AVIÃO %d] Mudando da pista %d para a pista %d\n", 
             getpid(), pista_antiga, mem_aviao->pista_destino);
-            pause();
             return;
         }
         else { // Direcao E
@@ -47,7 +46,6 @@ void trata_toggle_pista(int sinal){
             else mem_aviao->pista_destino = 06;
             printf("[AVIÃO %d] Mudando da pista %d para a pista %d\n", 
                 getpid(), pista_antiga, mem_aviao->pista_destino);
-            pause();
             return;
     }
 }
@@ -67,8 +65,9 @@ int main(int argc, char* argv[]){
     signal(SIGCONT, trata_sigcont);
     signal(SIGUSR2, trata_toggle_pista);
     signal(SIGUSR1, trata_toggle_freio);
-
+    float random = (time(NULL) + getpid());
     srand(time(NULL) + getpid());
+    printf("Aleatorio: %f\n",random);
     float atraso, x, y;
     char direcao;
     int pid_aviao;
